@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Underground Railroad Scanner</title>
+    <link rel="stylesheet" href="leaflet.css" />
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        background: #fff;
+        overflow: hidden;
+      }
+      #map {
+        height: 100vh;
+        width: 100vw;
+        background: #ddd;
+        cursor: crosshair;
+      }
+      .ui-overlay {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        color: #800080;
+        padding: 12px 24px;
+        border: 2px solid #800080;
+        border-radius: 5px;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+        pointer-events: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .leaflet-secret-pane {
+        z-index: 650;
+        pointer-events: none !important;
+        filter: drop-shadow(0 0 12px #bc13fe) brightness(1.1);
+        clip-path: circle(0px at 0px 0px);
+        transition: clip-path 0.05s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ui-overlay">NATIONAL SCANNER: TRACING FREEDOM CORRIDORS</div>
+    <div id="map"></div>
+
+    <script src="leaflet.js"></script>
+
+    <script>
+      window.onload = function () {
+        var map = L.map("map").setView([37.0, -92.0], 4);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap",
+        }).addTo(map);
+
+        var secretPane = map.createPane("secretPane");
+        var s = {
+          color: "#bc13fe",
+          weight: 5,
+          dashArray: "10, 15",
+          pane: "secretPane",
+          opacity: 0.8,
+        };
+
+        // --- ALL MAJOR NATIONAL CORRIDORS ---
+
+        // 1. EASTERN/APPALACHIAN (GA -> NC -> VA -> MD -> PA -> NY -> ON)
+        L.polyline(
+          [
+            [33.7, -84.4],
+            [35.6, -82.5],
+            [38.4, -76.1],
+            [39.9, -75.1],
+            [40.7, -74.0],
+            [43.1, -79.2],
+          ],
+          s,
+        ).addTo(map);
+
+        // 2. CENTRAL/GREAT LAKES (AL -> TN -> KY -> OH -> MI -> ON)
+        L.polyline(
+          [
+            [32.3, -86.3],
+            [36.1, -86.7],
+            [38.2, -85.7],
+            [40.0, -83.0],
+            [41.5, -81.7],
+            [42.3, -83.0],
+          ],
+          s,
+        ).addTo(map);
+
+        // 3. MISSISSIPPI/WESTERN (LA -> AR -> MO -> IL -> IA -> WI)
+        L.polyline(
+          [
+            [30.0, -90.0],
+            [34.7, -92.3],
+            [38.6, -90.2],
+            [41.8, -87.6],
+            [43.0, -87.9],
+          ],
+          s,
+        ).addTo(map);
+
+        // 4. COASTAL MARITIME (FL -> SC -> NC -> VA -> NJ -> MA)
+        L.polyline(
+          [
+            [25.7, -80.1],
+            [32.7, -79.9],
+            [36.8, -76.2],
+            [40.7, -74.0],
+            [42.3, -71.0],
+          ],
+          s,
+        ).addTo(map);
+
+        // 5. SOUTHWEST/MEXICO ROUTE (TX -> Mexico Border)
+        // Thousands fled South to Mexico where slavery was abolished in 1829.
+        L.polyline(
+          [
+            [30.2, -97.7],
+            [29.4, -98.4],
+            [27.5, -99.5],
+          ],
+          s,
+        ).addTo(map);
+
+        // --- KEY NATIONAL TERMINALS ---
+        var havens = [
+          { p: [42.5, -82.1], n: "Dawn Settlement, ON (Dresden)" },
+          { p: [42.3, -83.0], n: "Detroit, MI (Midnight)" },
+          { p: [43.1, -79.2], n: "St. Catharines, ON" },
+          { p: [39.9, -75.1], n: "Philadelphia, PA (Vigilance Committee)" },
+          { p: [41.8, -87.6], n: "Chicago, IL" },
+          { p: [27.5, -99.5], n: "Laredo, TX (Gateway to Mexico)" },
+          { p: [38.7, -83.7], n: "Ripley, OH (The Rankin House)" },
+          { p: [42.3, -71.0], n: "Boston, MA (Abolitionist Center)" },
+        ];
+
+        havens.forEach(function (h) {
+          L.circleMarker(h.p, {
+            radius: 10,
+            fillColor: "#00ffcc",
+            color: "#800080",
+            weight: 2,
+            fillOpacity: 1,
+            pane: "secretPane",
+          })
+            .addTo(map)
+            .bindPopup("<b>" + h.n + "</b>");
+        });
+
+        // --- SCANNER LOGIC (Reduced to 100px) ---
+        map.on("mousemove", function (e) {
+          var pane = map.getPane("secretPane");
+          pane.style.clipPath =
+            "circle(50px at " +
+            e.containerPoint.x +
+            "px " +
+            e.containerPoint.y +
+            "px)";
+        });
+
+        map.on("mouseout", function () {
+          map.getPane("secretPane").style.clipPath = "circle(0px)";
+        });
+      };
+    </script>
+  </body>
+</html>
