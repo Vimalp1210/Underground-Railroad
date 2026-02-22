@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <title>Underground Railroad Scanner</title>
-    <link rel="stylesheet" href="leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <style>
       body,
       html {
@@ -11,19 +14,63 @@
         padding: 0;
         height: 100%;
         width: 100%;
-        background: #fff;
+        display: flex;
+        background: #000;
         overflow: hidden;
       }
+
+      /* Sidebar Styling */
+      #sidebar {
+        width: 280px;
+        background: #1a1a1a;
+        color: #bc13fe;
+        font-family: "Courier New", monospace;
+        padding: 20px;
+        border-right: 2px solid #800080;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
+        z-index: 1100;
+        overflow-y: auto;
+      }
+      #sidebar h2 {
+        font-size: 18px;
+        border-bottom: 1px solid #800080;
+        padding-bottom: 10px;
+      }
+      #haven-list {
+        list-style: none;
+        padding: 0;
+      }
+      .haven-item {
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #333;
+        transition: 0.3s;
+        opacity: 0.5;
+        font-size: 13px;
+      }
+      /* Style for found havens */
+      .haven-item.found {
+        opacity: 1;
+        border-color: #00ffcc;
+        color: #00ffcc;
+        background: rgba(0, 255, 204, 0.1);
+      }
+
       #map {
+        flex-grow: 1;
         height: 100vh;
-        width: 100vw;
         background: #ddd;
         cursor: crosshair;
       }
+
+      .leaflet-tile-pane {
+        filter: grayscale(100%);
+      }
+
       .ui-overlay {
         position: absolute;
         top: 20px;
-        left: 50%;
+        left: calc(50% + 140px); /* Offset by half sidebar width */
         transform: translateX(-50%);
         z-index: 1000;
         background: rgba(255, 255, 255, 0.95);
@@ -34,31 +81,48 @@
         font-family: "Courier New", monospace;
         font-weight: bold;
         pointer-events: none;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
       }
+
       .leaflet-secret-pane {
         z-index: 650;
         pointer-events: none !important;
-        filter: drop-shadow(0 0 12px #bc13fe) brightness(1.1);
+        filter: drop-shadow(0 0 15px #bc13fe) brightness(1.2);
+        -webkit-mask-image: radial-gradient(
+          circle 50px at center,
+          black 20%,
+          rgba(0, 0, 0, 0.2) 70%,
+          transparent 100%
+        );
+        mask-image: radial-gradient(
+          circle 50px at center,
+          black 20%,
+          rgba(0, 0, 0, 0.2) 70%,
+          transparent 100%
+        );
         clip-path: circle(0px at 0px 0px);
-        transition: clip-path 0.05s linear;
       }
     </style>
   </head>
   <body>
-    <div class="ui-overlay">Underground Railroad: Find 9 Key Places</div>
+    <div id="sidebar">
+      <h2>HAVENS FOUND</h2>
+      <ul id="haven-list"></ul>
+    </div>
+
+    <div class="ui-overlay" id="ui-box">
+      UNDERGROUND RAILROAD: <span id="count">0</span>/9 FOUND
+    </div>
+
     <div id="map"></div>
 
-    <script src="leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
       window.onload = function () {
         var map = L.map("map").setView([37.0, -92.0], 4);
-
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: "&copy; OpenStreetMap",
-        }).addTo(map);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+          map,
+        );
 
         var secretPane = map.createPane("secretPane");
         var s = {
@@ -69,10 +133,7 @@
           opacity: 0.8,
         };
 
-        // --- ALL MAJOR NATIONAL CORRIDORS ---
-
-        // 1. EASTERN/APPALACHIAN (GA -> NC -> VA -> MD -> PA -> NY -> ON)
-        L.polyline(
+        const routes = [
           [
             [33.7, -84.4],
             [35.6, -82.5],
@@ -81,11 +142,6 @@
             [40.7, -74.0],
             [43.1, -79.2],
           ],
-          s,
-        ).addTo(map);
-
-        // 2. CENTRAL/GREAT LAKES (AL -> TN -> KY -> OH -> MI -> ON)
-        L.polyline(
           [
             [32.3, -86.3],
             [36.1, -86.7],
@@ -94,11 +150,6 @@
             [41.5, -81.7],
             [42.3, -83.0],
           ],
-          s,
-        ).addTo(map);
-
-        // 3. MISSISSIPPI/WESTERN (LA -> AR -> MO -> IL -> IA -> WI)
-        L.polyline(
           [
             [30.0, -90.0],
             [34.7, -92.3],
@@ -106,11 +157,6 @@
             [41.8, -87.6],
             [43.0, -87.9],
           ],
-          s,
-        ).addTo(map);
-
-        // 4. COASTAL MARITIME (FL -> SC -> NC -> VA -> NJ -> MA)
-        L.polyline(
           [
             [25.7, -80.1],
             [32.7, -79.9],
@@ -118,32 +164,38 @@
             [40.7, -74.0],
             [42.3, -71.0],
           ],
-          s,
-        ).addTo(map);
-
-        // 5. SOUTHWEST/MEXICO ROUTE (TX -> Mexico Border)
-        // Thousands fled South to Mexico where slavery was abolished in 1829.
-        L.polyline(
           [
             [30.2, -97.7],
             [29.4, -98.4],
             [27.5, -99.5],
           ],
-          s,
-        ).addTo(map);
-
-        // --- KEY NATIONAL TERMINALS ---
-        var havens = [
-          { p: [42.5, -82.1], n: "Dawn Settlement, ON (Dresden)" },
-          { p: [42.3, -83.0], n: "Detroit, MI (Midnight)" },
-          { p: [43.1, -79.2], n: "St. Catharines, ON" },
-          { p: [39.9, -75.1], n: "Philadelphia, PA (Vigilance Committee)" },
-          { p: [41.8, -87.6], n: "Chicago, IL" },
-          { p: [27.5, -99.5], n: "Laredo, TX (Gateway to Mexico)" },
-          { p: [38.7, -83.7], n: "Ripley, OH (The Rankin House)" },
-          { p: [42.3, -71.0], n: "Boston, MA (Abolitionist Center)" },
-          { p: [25.8, -80.2], n: "Miami, FL (Gateway to Bahamas)" },
         ];
+        routes.forEach((coords) => L.polyline(coords, s).addTo(map));
+
+        var havens = [
+          { id: "h1", p: [42.5, -82.1], n: "Dawn Settlement, ON" },
+          { id: "h2", p: [42.3, -83.0], n: "Detroit, MI (Midnight)" },
+          { id: "h3", p: [43.1, -79.2], n: "St. Catharines, ON" },
+          { id: "h4", p: [39.9, -75.1], n: "Philadelphia, PA" },
+          { id: "h5", p: [41.8, -87.6], n: "Chicago, IL" },
+          { id: "h6", p: [27.5, -99.5], n: "Laredo, TX (Mexico)" },
+          { id: "h7", p: [38.7, -83.7], n: "The Rankin House, OH" },
+          { id: "h8", p: [42.3, -71.0], n: "Boston, MA" },
+          { id: "h9", p: [25.8, -80.2], n: "Miami, FL (Bahamas)" },
+        ];
+
+        // Populate Sidebar
+        var listContainer = document.getElementById("haven-list");
+        havens.forEach((h) => {
+          var li = document.createElement("li");
+          li.id = h.id;
+          li.className = "haven-item";
+          li.innerText = "[ LOCKED ] " + h.n;
+          listContainer.appendChild(li);
+        });
+
+        var foundCount = 0;
+        var foundPlaces = new Set();
 
         havens.forEach(function (h) {
           L.circleMarker(h.p, {
@@ -153,20 +205,36 @@
             weight: 2,
             fillOpacity: 1,
             pane: "secretPane",
-          })
-            .addTo(map)
-            .bindPopup("<b>" + h.n + "</b>");
+          }).addTo(map);
+
+          var ghost = L.circleMarker(h.p, {
+            radius: 20,
+            stroke: false,
+            fillOpacity: 0,
+          }).addTo(map);
+          ghost.bindPopup("<b>" + h.n + "</b>");
+
+          ghost.on("mouseover", function () {
+            if (!foundPlaces.has(h.n)) {
+              foundPlaces.add(h.n);
+              foundCount++;
+              document.getElementById("count").innerText = foundCount;
+
+              // Update Sidebar Item
+              var listItem = document.getElementById(h.id);
+              listItem.classList.add("found");
+              listItem.innerText = "[ FOUND ] " + h.n;
+
+              if (foundCount === 9)
+                document.getElementById("ui-box").innerText =
+                  "ALL HAVENS FOUND!";
+            }
+          });
         });
 
-        // --- SCANNER LOGIC (Reduced to 100px) ---
         map.on("mousemove", function (e) {
           var pane = map.getPane("secretPane");
-          pane.style.clipPath =
-            "circle(30px at " +
-            e.containerPoint.x +
-            "px " +
-            e.containerPoint.y +
-            "px)";
+          pane.style.clipPath = `circle(50px at ${e.containerPoint.x}px ${e.containerPoint.y}px)`;
         });
 
         map.on("mouseout", function () {
