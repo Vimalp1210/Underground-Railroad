@@ -19,14 +19,13 @@
         overflow: hidden;
       }
 
-      /* Sidebar Styling */
       #sidebar {
         width: 280px;
         background: #1a1a1a;
-        color: #bc13fe;
+        color: #fe1313;
         font-family: "Courier New", monospace;
         padding: 20px;
-        border-right: 2px solid #800080;
+        border-right: 2px solid #800000;
         box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
         z-index: 1100;
         overflow-y: auto;
@@ -48,35 +47,35 @@
         opacity: 0.5;
         font-size: 13px;
       }
-      /* Style for found havens */
+
       .haven-item.found {
         opacity: 1;
-        border-color: #00ffcc;
-        color: #00ffcc;
+        border-color: #51ff00;
+        color: #26ff00;
         background: rgba(0, 255, 204, 0.1);
       }
 
       #map {
         flex-grow: 1;
         height: 100vh;
-        background: #ddd;
+        background: #060000;
         cursor: crosshair;
       }
 
       .leaflet-tile-pane {
-        filter: grayscale(100%);
+        filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
       }
 
       .ui-overlay {
         position: absolute;
         top: 20px;
-        left: calc(50% + 140px); /* Offset by half sidebar width */
+        left: calc(50% + 140px);
         transform: translateX(-50%);
         z-index: 1000;
         background: rgba(255, 255, 255, 0.95);
-        color: #800080;
+        color: #000000;
         padding: 12px 24px;
-        border: 2px solid #800080;
+        border: 2px solid #000000;
         border-radius: 5px;
         font-family: "Courier New", monospace;
         font-weight: bold;
@@ -86,7 +85,7 @@
       .leaflet-secret-pane {
         z-index: 650;
         pointer-events: none !important;
-        filter: drop-shadow(0 0 15px #bc13fe) brightness(1.2);
+        filter: drop-shadow(0 0 15px #a316a5) brightness(1.2);
         -webkit-mask-image: radial-gradient(
           circle 50px at center,
           black 20%,
@@ -126,7 +125,7 @@
 
         var secretPane = map.createPane("secretPane");
         var s = {
-          color: "#bc13fe",
+          color: "#ff0000",
           weight: 5,
           dashArray: "10, 15",
           pane: "secretPane",
@@ -184,7 +183,6 @@
           { id: "h9", p: [25.8, -80.2], n: "Miami, FL (Bahamas)" },
         ];
 
-        // Populate Sidebar
         var listContainer = document.getElementById("haven-list");
         havens.forEach((h) => {
           var li = document.createElement("li");
@@ -220,7 +218,6 @@
               foundCount++;
               document.getElementById("count").innerText = foundCount;
 
-              // Update Sidebar Item
               var listItem = document.getElementById(h.id);
               listItem.classList.add("found");
               listItem.innerText = "[ FOUND ] " + h.n;
