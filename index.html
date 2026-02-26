@@ -3,8 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <title>Underground Railroad Scanner</title>
+
     <!-- Local Leaflet CSS -->
     <link rel="stylesheet" href="leaflet.css" />
+
     <style>
       body,
       html {
@@ -17,7 +19,6 @@
         overflow: hidden;
       }
 
-      /* Welcome Modal */
       #welcome-modal {
         position: fixed;
         top: 0;
@@ -40,16 +41,6 @@
         color: #26ff00;
         box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
-      .modal-content h1 {
-        border-bottom: 1px solid #800080;
-        padding-bottom: 15px;
-        margin-top: 0;
-      }
-      .modal-content p {
-        line-height: 1.6;
-        font-size: 14px;
-        color: #ccc;
-      }
       .modal-content button {
         background: transparent;
         color: #ff0000;
@@ -67,21 +58,24 @@
       }
 
       #sidebar {
-        width: 280px;
+        width: 300px;
         background: #1a1a1a;
         color: #fe1313;
         font-family: "Courier New", monospace;
         padding: 20px;
         border-right: 2px solid #800000;
-        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
         z-index: 1100;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      .scroll-section {
+        flex: 1;
         overflow-y: auto;
+        margin-bottom: 20px;
       }
-      #sidebar h2 {
-        font-size: 18px;
-        border-bottom: 1px solid #800080;
-        padding-bottom: 10px;
-      }
+
       #haven-list {
         list-style: none;
         padding: 0;
@@ -101,12 +95,33 @@
         background: rgba(0, 255, 204, 0.1);
       }
 
+      .dictionary-container {
+        border-top: 2px solid #800000;
+        padding-top: 15px;
+      }
+      .dictionary-entry {
+        margin-bottom: 12px;
+        font-size: 12px;
+      }
+      .term {
+        color: #26ff00;
+        font-weight: bold;
+        display: block;
+      }
+      .definition {
+        color: #ccc;
+        display: block;
+        margin-top: 2px;
+      }
+
       #map {
         flex-grow: 1;
         height: 100vh;
         background: #060000;
         cursor: crosshair;
       }
+
+      /* Green Inverted Map Base */
       .leaflet-tile-pane {
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
       }
@@ -114,25 +129,23 @@
       .ui-overlay {
         position: absolute;
         top: 20px;
-        left: calc(50% + 140px);
+        left: calc(50% + 150px);
         transform: translateX(-50%);
         z-index: 1000;
         background: rgba(255, 255, 255, 0.95);
-        color: #000000;
+        color: #000;
         padding: 12px 24px;
-        border: 2px solid #000000;
-        border-radius: 5px;
+        border: 2px solid #000;
         font-family: "Courier New", monospace;
-        font-weight: bold;
-        pointer-events: none;
       }
 
-      /* FIXED: Ensure pane allows pointer events so entire circle can be clicked */
+      /* PURPLE SCANNER GLOW */
       .leaflet-secret-pane {
         z-index: 650;
         pointer-events: auto !important;
-        filter: drop-shadow(0 0 15px #a316a5) brightness(1.2);
+        filter: drop-shadow(0 0 25px #ff00ff) brightness(1.2);
         clip-path: circle(0px at 0px 0px);
+        transition: clip-path 0.05s ease-out;
       }
     </style>
   </head>
@@ -151,9 +164,51 @@
     </div>
 
     <div id="sidebar">
-      <h2>SAFE HOUSES FOUND</h2>
-      <ul id="haven-list"></ul>
+      <div class="scroll-section">
+        <h2>SAFE HOUSES FOUND</h2>
+        <ul id="haven-list"></ul>
+      </div>
+
+      <div class="dictionary-container scroll-section">
+        <h2>DICTIONARY</h2>
+        <div class="dictionary-entry">
+          <span class="term">ABOLITIONISTS</span>
+          <span class="definition"
+            >A person who favors the abolition of a practice or institution,
+            especially capital punishment or (formerly) slavery.</span
+          >
+        </div>
+        <div class="dictionary-entry">
+          <span class="term">STATION MASTERS</span>
+          <span class="definition"
+            >An abolitionist or ally who hid escaping enslaved people
+            ("passengers") in their homes.</span
+          >
+        </div>
+        <div class="dictionary-entry">
+          <span class="term">AGENTS</span>
+          <span class="definition"
+            >A coordinator or facilitator who helped enslaved people find,
+            enter, and navigate the network to freedom.</span
+          >
+        </div>
+        <div class="dictionary-entry">
+          <span class="term">FREEDOM SEEKERS</span>
+          <span class="definition"
+            >The decision of the enslaved person to take control of their
+            destiny from the enslaver by leaving the site of enslavement.</span
+          >
+        </div>
+        <div class="dictionary-entry">
+          <span class="term">QUAKERS</span>
+          <span class="definition"
+            >Quakers were people that believed in the equality of everyone
+            .</span
+          >
+        </div>
+      </div>
     </div>
+
     <div class="ui-overlay" id="ui-box">
       UNDERGROUND RAILROAD: <span id="count">0</span>/10 FOUND
     </div>
@@ -174,7 +229,9 @@
         );
 
         var secretPane = map.createPane("secretPane");
-        var s = {
+
+        // RED ROUTES
+        var routeStyle = {
           color: "#ff0000",
           weight: 5,
           dashArray: "10, 15",
@@ -219,7 +276,7 @@
             [27.5, -99.5],
           ],
         ];
-        routes.forEach((coords) => L.polyline(coords, s).addTo(map));
+        routes.forEach((coords) => L.polyline(coords, routeStyle).addTo(map));
 
         var havens = [
           {
@@ -280,7 +337,7 @@
             id: "h10",
             p: [44.7, -63.6],
             n: "Africville, NS",
-            url: "https://docs.google.com/presentation/d/101dKpazE6dYJTDdbJFzcVQz5ukE-ZCQogphyXVL3Zac/edit?slide=id.p#slide=id.p",
+            url: "https://docs.google.com/presentation/d/101dKpazE6dYJTDdbJFzcVQz5ukE-ZCQogphyXVL3Zac/edit?slide=id.g3c995130b88_0_1#slide=id.g3c995130b88_0_1",
           },
         ];
 
@@ -302,11 +359,9 @@
             weight: 8,
             fillOpacity: 1,
             pane: "secretPane",
-            interactive: true,
           }).addTo(map);
 
           marker.on("mouseover", function () {
-            map.getContainer().style.cursor = "pointer";
             if (!foundPlaces.has(h.n)) {
               foundPlaces.add(h.n);
               foundCount++;
@@ -319,19 +374,15 @@
                   "ALL HAVENS FOUND!";
             }
           });
-
-          marker.on("mouseout", function () {
-            map.getContainer().style.cursor = "crosshair";
-          });
-          marker.on("click", function () {
-            window.open(h.url, "_blank");
-          });
+          marker.on("click", () => window.open(h.url, "_blank"));
         });
 
         map.on("mousemove", function (e) {
           var pane = map.getPane("secretPane");
-          if (pane)
-            pane.style.clipPath = `circle(50px at ${e.containerPoint.x}px ${e.containerPoint.y}px)`;
+          if (pane) {
+            var point = map.mouseEventToLayerPoint(e.originalEvent);
+            pane.style.clipPath = `circle(50px at ${point.x}px ${point.y}px)`;
+          }
         });
       };
     </script>
