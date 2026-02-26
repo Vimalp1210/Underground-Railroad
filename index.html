@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Underground Railroad Scanner</title>
+    <!-- Local Leaflet CSS -->
     <link rel="stylesheet" href="leaflet.css" />
     <style>
       body,
@@ -14,6 +15,55 @@
         display: flex;
         background: #000;
         overflow: hidden;
+      }
+
+      /* Welcome Modal */
+      #welcome-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Courier New", monospace;
+      }
+      .modal-content {
+        background: #1a1a1a;
+        padding: 40px;
+        border: 2px solid #800080;
+        text-align: center;
+        max-width: 600px;
+        color: #26ff00;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
+      }
+      .modal-content h1 {
+        border-bottom: 1px solid #800080;
+        padding-bottom: 15px;
+        margin-top: 0;
+      }
+      .modal-content p {
+        line-height: 1.6;
+        font-size: 14px;
+        color: #ccc;
+      }
+      .modal-content button {
+        background: transparent;
+        color: #ff0000;
+        border: 1px solid #ff0000;
+        padding: 12px 25px;
+        cursor: pointer;
+        margin-top: 25px;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+      .modal-content button:hover {
+        background: #ff0000;
+        color: #000;
       }
 
       #sidebar {
@@ -44,7 +94,6 @@
         opacity: 0.5;
         font-size: 13px;
       }
-
       .haven-item.found {
         opacity: 1;
         border-color: #51ff00;
@@ -58,7 +107,6 @@
         background: #060000;
         cursor: crosshair;
       }
-
       .leaflet-tile-pane {
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
       }
@@ -79,41 +127,46 @@
         pointer-events: none;
       }
 
+      /* FIXED: Ensure pane allows pointer events so entire circle can be clicked */
       .leaflet-secret-pane {
         z-index: 650;
-        pointer-events: none !important;
+        pointer-events: auto !important;
         filter: drop-shadow(0 0 15px #a316a5) brightness(1.2);
-        -webkit-mask-image: radial-gradient(
-          circle 50px at center,
-          black 20%,
-          rgba(0, 0, 0, 0.2) 70%,
-          transparent 100%
-        );
-        mask-image: radial-gradient(
-          circle 50px at center,
-          black 20%,
-          rgba(0, 0, 0, 0.2) 70%,
-          transparent 100%
-        );
         clip-path: circle(0px at 0px 0px);
       }
     </style>
   </head>
   <body>
+    <div id="welcome-modal">
+      <div class="modal-content">
+        <h1>THE UNDERGROUND RAILROAD</h1>
+        <p>
+          Welcome to the exhibit! In this exhibit, you will learn about the
+          Underground Railroad and where it was throughout America. Use the
+          scanner to find hidden routes and safe houses. Click on the safe
+          houses to learn about it and how the abolitonists fought back.
+        </p>
+        <button onclick="closeWelcome()">INITIALIZE SCANNER</button>
+      </div>
+    </div>
+
     <div id="sidebar">
       <h2>SAFE HOUSES FOUND</h2>
       <ul id="haven-list"></ul>
     </div>
-
     <div class="ui-overlay" id="ui-box">
       UNDERGROUND RAILROAD: <span id="count">0</span>/10 FOUND
     </div>
-
     <div id="map"></div>
 
+    <!-- Local Leaflet JS -->
     <script src="leaflet.js"></script>
 
     <script>
+      function closeWelcome() {
+        document.getElementById("welcome-modal").style.display = "none";
+      }
+
       window.onload = function () {
         var map = L.map("map").setView([37.0, -92.0], 4);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
@@ -227,80 +280,58 @@
             id: "h10",
             p: [44.7, -63.6],
             n: "Africville, NS",
-            url: "https://docs.google.com/presentation/d/101dKpazE6dYJTDdbJFzcVQz5ukE-ZCQogphyXVL3Zac/edit?slide=id.g3c995130b88_0_1#slide=id.g3c995130b88_0_1",
+            url: "https://docs.google.com/presentation/d/101dKpazE6dYJTDdbJFzcVQz5ukE-ZCQogphyXVL3Zac/edit?slide=id.p#slide=id.p",
           },
         ];
 
         var listContainer = document.getElementById("haven-list");
+        var foundPlaces = new Set();
+        var foundCount = 0;
+
         havens.forEach((h) => {
           var li = document.createElement("li");
           li.id = h.id;
           li.className = "haven-item";
           li.innerText = "[ LOCKED ] " + h.n;
           listContainer.appendChild(li);
-        });
 
-        var foundCount = 0;
-        var foundPlaces = new Set();
-
-        havens.forEach(function (h) {
-          L.circleMarker(h.p, {
-            radius: 10,
+          var marker = L.circleMarker(h.p, {
+            radius: 12,
             fillColor: "#00ffcc",
             color: "#800080",
-            weight: 2,
+            weight: 8,
             fillOpacity: 1,
             pane: "secretPane",
-          }).addTo(map);
-
-          var ghost = L.circleMarker(h.p, {
-            radius: 20,
-            stroke: false,
-            fillOpacity: 0,
             interactive: true,
           }).addTo(map);
 
-          ghost.bindPopup(
-            "<b>" +
-              h.n +
-              "</b><br><a href='" +
-              h.url +
-              "' target='_blank'>Historical Site</a>",
-          );
-
-          ghost.on("mouseover", function () {
+          marker.on("mouseover", function () {
             map.getContainer().style.cursor = "pointer";
             if (!foundPlaces.has(h.n)) {
               foundPlaces.add(h.n);
               foundCount++;
               document.getElementById("count").innerText = foundCount;
-
               var listItem = document.getElementById(h.id);
               listItem.classList.add("found");
               listItem.innerText = "[ FOUND ] " + h.n;
-
               if (foundCount === 10)
                 document.getElementById("ui-box").innerText =
                   "ALL HAVENS FOUND!";
             }
           });
 
-          ghost.on("mouseout", function () {
+          marker.on("mouseout", function () {
             map.getContainer().style.cursor = "crosshair";
           });
-
-          ghost.on("click", function () {
+          marker.on("click", function () {
             window.open(h.url, "_blank");
           });
         });
 
         map.on("mousemove", function (e) {
           var pane = map.getPane("secretPane");
-          pane.style.clipPath = `circle(50px at ${e.containerPoint.x}px ${e.containerPoint.y}px)`;
-        });
-
-        map.on("mouseout", function () {
-          map.getPane("secretPane").style.clipPath = "circle(0px)";
+          if (pane)
+            pane.style.clipPath = `circle(50px at ${e.containerPoint.x}px ${e.containerPoint.y}px)`;
         });
       };
     </script>
