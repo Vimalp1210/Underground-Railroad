@@ -30,14 +30,15 @@
         align-items: center;
         justify-content: center;
         font-family: "Courier New", monospace;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
       .modal-content {
         background: #1a1a1a;
         padding: 40px;
-        border: 2px solid #800080;
+        border: 2px solid #800000;
         text-align: center;
         max-width: 600px;
-        color: #26ff00;
+        color: #fbfbfb;
         box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
       .modal-content button {
@@ -54,6 +55,7 @@
       .modal-content button:hover {
         background: #ff0000;
         color: #000;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
 
       #sidebar {
@@ -67,6 +69,7 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
 
       .scroll-section {
@@ -86,12 +89,14 @@
         transition: 0.3s;
         opacity: 0.5;
         font-size: 13px;
+        box-shadow: 0 0 30px rgba(128, 0, 0, 0.5);
       }
       .haven-item.found {
         opacity: 1;
         border-color: #51ff00;
         color: #26ff00;
         background: rgba(0, 255, 204, 0.1);
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
 
       .dictionary-container {
@@ -118,6 +123,7 @@
         height: 100vh;
         background: #060000;
         cursor: crosshair;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
 
       .leaflet-tile-pane {
@@ -135,6 +141,7 @@
         padding: 12px 24px;
         border: 2px solid #000;
         font-family: "Courier New", monospace;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
       }
 
       .leaflet-secret-pane {
@@ -144,17 +151,56 @@
         clip-path: circle(0px at 0px 0px);
         transition: clip-path 0.05s ease-out;
       }
+      .ui-overlay {
+        position: absolute;
+        top: 20px;
+        left: calc(50% + 150px);
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.85);
+        color: #ffffff;
+        padding: 10px 24px;
+        border: 2px solid #800000;
+        font-family: "Courier New", monospace;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        min-width: 480px;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
+      }
+
+      #reopen-statement {
+        background: transparent;
+        color: #ffffff;
+        border: 1px solid #ffffff;
+        padding: 5px 12px;
+        cursor: pointer;
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        transition: 0.3s;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
+      }
+
+      #reopen-statement:hover {
+        background: #ffffff;
+        color: #000;
+        box-shadow: 0 0 30px rgba(128, 0, 128, 0.5);
+      }
     </style>
   </head>
   <body>
     <div id="welcome-modal">
       <div class="modal-content">
-        <h1>THE UNDERGROUND RAILROAD</h1>
+        <h1>THE FREEDOM TRAIN EXHIBIT - CURATOR'S STATEMENT</h1>
         <p>
-          Welcome to the exhibit! In this exhibit, you will learn about the
-          Underground Railroad and where it was throughout America. Use the
-          scanner to find hidden routes and safe houses. Click on the safe
-          houses to learn about it and how the abolitonists fought back.
+          Welcome to our Exhibit! This exhibit amplifies the voice of Black
+          people and changes the perspective that they're passive people. By
+          using the 'black light reader' over parts of America and Canada, you
+          will find routes from the Underground Railroad and links that will
+          lead you to different safe houses and how they were important to the
+          Underground Railroad. When you're done looking at everything, you will
+          realize how Black people were mistreated but also how they never
+          backed down and fought for freedom and equality. - Vimal, Noah, Etthan
         </p>
         <button onclick="closeWelcome()">INITIALIZE SCANNER</button>
       </div>
@@ -206,13 +252,22 @@
     </div>
 
     <div class="ui-overlay" id="ui-box">
-      UNDERGROUND RAILROAD: <span id="count">0</span>/10 FOUND
+      <div style="display: flex; align-items: center; gap: 20px">
+        <span>UNDERGROUND RAILROAD: <span id="count">0</span>/10 FOUND</span>
+        <button onclick="openWelcome()" id="reopen-statement">
+          CURATOR'S STATEMENT
+        </button>
+      </div>
     </div>
+
     <div id="map"></div>
 
     <script src="leaflet.js"></script>
 
     <script>
+      function openWelcome() {
+        document.getElementById("welcome-modal").style.display = "flex";
+      }
       function closeWelcome() {
         document.getElementById("welcome-modal").style.display = "none";
       }
