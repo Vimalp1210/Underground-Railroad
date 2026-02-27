@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>Underground Railroad Scanner</title>
 
-    <!-- Local Leaflet CSS -->
     <link rel="stylesheet" href="leaflet.css" />
 
     <style>
@@ -121,7 +120,6 @@
         cursor: crosshair;
       }
 
-      /* Green Inverted Map Base */
       .leaflet-tile-pane {
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
       }
@@ -139,7 +137,6 @@
         font-family: "Courier New", monospace;
       }
 
-      /* PURPLE SCANNER GLOW */
       .leaflet-secret-pane {
         z-index: 650;
         pointer-events: auto !important;
@@ -213,7 +210,6 @@
     </div>
     <div id="map"></div>
 
-    <!-- Local Leaflet JS -->
     <script src="leaflet.js"></script>
 
     <script>
@@ -229,7 +225,6 @@
 
         var secretPane = map.createPane("secretPane");
 
-        // RED ROUTES
         var routeStyle = {
           color: "#ff0000",
           weight: 5,
@@ -282,61 +277,61 @@
             id: "h1",
             p: [42.5, -82.1],
             n: "Dawn Settlement, ON",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_0#slide=id.g3ca5bc7cafc_0_0",
+            url: "https://docs.google.com/presentation/d/1RHJ6qVz7Jk6h9nqalcxzoU4UhQ4WeogrspMWw6EEFhY/present?slide=id.g3cb5ba8d504_0_0#slide=id.g3cb5ba8d504_0_0",
           },
           {
             id: "h2",
             p: [42.3, -83.0],
             n: "Detroit, MI (Midnight)",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_5#slide=id.g3ca5bc7cafc_0_5",
+            url: "https://docs.google.com/presentation/d/1B8xA-Mt7js2kjIOBza3eWLHF7uf5rSYFO4FJe93PUX0/present?slide=id.g3cb5c2db828_0_2#slide=id.g3cb5c2db828_0_2",
           },
           {
             id: "h3",
             p: [43.1, -79.2],
             n: "St. Catharines, ON",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_12#slide=id.g3ca5bc7cafc_0_12",
+            url: "https://docs.google.com/presentation/d/14qg5638FEj92saP9LpwBy_hxrQ-nSmlYYHv8aor3zO8/present?slide=id.g3cb5b039ec6_0_0#slide=id.g3cb5b039ec6_0_0",
           },
           {
             id: "h4",
             p: [39.9, -75.1],
             n: "Philadelphia, PA",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_15#slide=id.g3ca5bc7cafc_0_15",
+            url: "https://docs.google.com/presentation/d/1zvq88Lm85cgyNsep_o3ksXqqNZ5KWBBONFDHfTeGDxY/present?slide=id.g3c0cf6ded34_0_0#slide=id.g3c0cf6ded34_0_0",
           },
           {
             id: "h5",
             p: [41.8, -87.6],
             n: "Chicago, IL",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_18#slide=id.g3ca5bc7cafc_0_18",
+            url: "https://docs.google.com/presentation/d/1eDh_iRgFZLVunGVRq5nejlfKr7ZmtGMHaK0znbLYcNY/present?slide=id.g3cb5c234ac3_0_0#slide=id.g3cb5c234ac3_0_0",
           },
           {
             id: "h6",
             p: [27.5, -99.5],
             n: "Laredo, TX (Mexico)",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_21#slide=id.g3ca5bc7cafc_0_21",
+            url: "https://docs.google.com/presentation/d/1D5D8puFl4UlPWxZ2ERkt7MHkoGNNHykcirD58B3MyIs/present?slide=id.g3c0cf6d0ffc_0_0#slide=id.g3c0cf6d0ffc_0_0",
           },
           {
             id: "h7",
             p: [38.7, -83.7],
             n: "The Rankin House, OH",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_24#slide=id.g3ca5bc7cafc_0_24",
+            url: "https://docs.google.com/presentation/d/1sb-khAMpNv-NaRagFfmoP8sn4P1dzc9Y50c9s69DZ3A/present?slide=id.g3cb5c34a8de_0_0#slide=id.g3cb5c34a8de_0_0",
           },
           {
             id: "h8",
             p: [42.3, -71.0],
             n: "Boston, MA",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_27#slide=id.g3ca5bc7cafc_0_27",
+            url: "https://docs.google.com/presentation/d/14BlgXOMYpJR1tLyCP8frfJ0gU6KpvuLM8Xwj9Cb_Wr0/present?slide=id.g3cb5bcd7250_0_0#slide=id.g3cb5bcd7250_0_0",
           },
           {
             id: "h9",
             p: [25.8, -80.2],
             n: "Miami, FL (Bahamas)",
-            url: "https://docs.google.com/presentation/d/1ZpLp5Bui7M6tjMhI1fXi--yg7nkp5ISHeajJ2iaGMHo/edit?slide=id.g3ca5bc7cafc_0_30#slide=id.g3ca5bc7cafc_0_30",
+            url: "https://docs.google.com/presentation/d/1y4n37jrDUHLPXsRkYv-YEJGRn2KGTf-k_6RAfSLxTWU/present?slide=id.g3cb5b8e91be_0_0#slide=id.g3cb5b8e91be_0_0",
           },
           {
             id: "h10",
             p: [44.7, -63.6],
             n: "Africville, NS",
-            url: "https://docs.google.com/presentation/d/101dKpazE6dYJTDdbJFzcVQz5ukE-ZCQogphyXVL3Zac/edit?slide=id.g3c995130b88_0_1#slide=id.g3c995130b88_0_1",
+            url: "https://docs.google.com/presentation/d/101dKpazE6dYJTDdbJFzcVQz5ukE-ZCQogphyXVL3Zac/present?slide=id.g3c995130b88_0_1#slide=id.g3c995130b88_0_1",
           },
         ];
 
